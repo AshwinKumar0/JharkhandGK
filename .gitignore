@@ -3,6 +3,12 @@ backend/.env
 backend/.DS_Store
 backend/npm-debug.log*
 
+.env
+.env.local
+.env.*.local
+.idea/
+.vscode/
+
 android/.gradle/
 android/local.properties
 android/.idea/

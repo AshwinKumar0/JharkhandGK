@@ -12,6 +12,12 @@ npm run dev
 
 Fill `.env` with your MongoDB Atlas connection string. Do not put this value in the Android app.
 
+Generate a strong JWT secret locally:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
 ## Deploy to Render Free
 
 This backend is ready for Render as a free Web Service.
@@ -36,8 +42,8 @@ Instance Type: Free
 ```text
 MONGODB_URI=<your MongoDB Atlas connection string>
 JWT_SECRET=<a long random secret>
-AUTH0_DOMAIN=dev-qe5872uaalyzgbm2.us.auth0.com
-AUTH0_CLIENT_ID=7N2UzLDpxbdnhRwuUSXBRcFWZhiJzmDc
+AUTH0_DOMAIN=<your Auth0 domain>
+AUTH0_CLIENT_ID=<your Auth0 client id>
 QUESTION_COLLECTION=GK
 CORS_ORIGIN=*
 DEFAULT_BANK_ID=jharkhand-pocket-gk-mcqs
@@ -49,6 +55,19 @@ Render provides `PORT` automatically, so do not set it manually.
 ### Option 2: Render blueprint
 
 Push the repository with the root `render.yaml` file, then create a new Render Blueprint from the repository. Render will read the backend settings automatically. You still need to enter the secret values for `MONGODB_URI`, `JWT_SECRET`, `AUTH0_DOMAIN`, and `AUTH0_CLIENT_ID`.
+
+Required Render environment variables:
+
+```text
+MONGODB_URI=<your MongoDB Atlas connection string>
+JWT_SECRET=<a long random secret>
+AUTH0_DOMAIN=<your Auth0 domain>
+AUTH0_CLIENT_ID=<your Auth0 client id>
+QUESTION_COLLECTION=GK
+CORS_ORIGIN=*
+DEFAULT_BANK_ID=jharkhand-pocket-gk-mcqs
+NODE_ENV=production
+```
 
 After deployment, test:
 

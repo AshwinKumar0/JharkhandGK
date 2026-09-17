@@ -156,6 +156,9 @@ Implemented:
 - Express app setup.
 - MongoDB Atlas connection via Mongoose.
 - `.env.example` for safe local configuration.
+- Render deployment blueprint in `render.yaml`.
+- Node engine declaration for hosted deployment.
+- Startup validation for required backend secrets.
 - JWT auth helpers.
 - Auth routes:
   - `POST /api/auth/register`
@@ -236,6 +239,14 @@ Needs Android Studio Gradle sync and build.
 
 ## Needs To Be Done
 
+### GitHub Upload Checklist
+
+1. Keep `backend/.env` local. It is ignored and must not be committed.
+2. Commit `backend/.env.example`, `render.yaml`, source files, and lockfiles.
+3. Rotate any secret that was pasted into chat, screenshots, or a shared repository.
+4. Push to GitHub.
+5. In Render, create a Blueprint from `render.yaml` or a Web Service using `backend/` as the root directory.
+
 ### Immediate Next Steps
 
 1. Copy `backend/.env.example` to `backend/.env`.
@@ -267,7 +278,6 @@ Register/Login -> select range -> start Practice -> answer question -> value upd
 - Add duplicate-report prevention if desired.
 - Add admin endpoints later for report review.
 - Add stronger validation for request bodies.
-- Add deployment config for chosen hosting provider.
 
 ### Android Work Remaining
 
@@ -315,6 +325,31 @@ JWT_SECRET=...
 QUESTION_COLLECTION=questions
 CORS_ORIGIN=*
 DEFAULT_BANK_ID=jharkhand-pocket-gk-mcqs
+AUTH0_DOMAIN=...
+AUTH0_CLIENT_ID=...
+```
+
+Generate a strong `JWT_SECRET`:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
+### Render
+
+The root `render.yaml` deploys the backend as a Render Web Service with:
+
+```text
+Root Directory: backend
+Build Command: npm ci
+Start Command: npm start
+Health Check Path: /health
+```
+
+Set the secret environment variables in Render, then verify:
+
+```text
+https://your-render-service.onrender.com/health
 ```
 
 ### Android
@@ -345,6 +380,7 @@ http://192.168.1.10:4000/api/
 - Implemented Android Compose scaffold and main MVP screens.
 - Added root `.gitignore`.
 - Added this living README.
+- Prepared backend for GitHub and Render deployment with safe env template, Node engine, required-env validation, and deployment docs.
 
 ## README Maintenance Rule
 

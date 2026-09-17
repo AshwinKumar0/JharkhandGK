@@ -4,6 +4,9 @@
   "description": "Backend API for the Jharkhand GK Android app.",
   "type": "module",
   "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
