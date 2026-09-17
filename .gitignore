@@ -1,0 +1,12 @@
+backend/node_modules/
+backend/.env
+backend/.DS_Store
+backend/npm-debug.log*
+
+android/.gradle/
+android/local.properties
+android/.idea/
+android/build/
+android/app/build/
+android/*.iml
+android/app/*.iml

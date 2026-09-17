@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: jharkhand-gk-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: AUTH0_DOMAIN
+        sync: false
+      - key: AUTH0_CLIENT_ID
+        sync: false
+      - key: QUESTION_COLLECTION
+        value: GK
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: DEFAULT_BANK_ID
+        value: jharkhand-pocket-gk-mcqs
