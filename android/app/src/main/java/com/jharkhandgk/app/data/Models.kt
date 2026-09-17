@@ -63,7 +63,13 @@ data class QuestionsResponse(val questions: List<QuestionDto>)
 data class PracticeStartRequest(val bankId: String, val rangeStart: Int, val rangeEnd: Int)
 
 @Serializable
-data class PracticeStartResponse(val sessionId: String, val nextQuestion: QuestionDto?)
+data class PracticeStartResponse(
+    val sessionId: String,
+    val nextQuestion: QuestionDto?,
+    val questions: List<QuestionDto> = emptyList(),
+    val totalAvailable: Int = 0,
+    val nextBatchAvailable: Boolean = false
+)
 
 @Serializable
 data class PracticeAnswerRequest(
@@ -71,7 +77,8 @@ data class PracticeAnswerRequest(
     val questionRef: String,
     val selectedOptionKey: String? = null,
     val timeTakenMs: Int,
-    val timedOut: Boolean
+    val timedOut: Boolean,
+    val answerId: String? = null
 )
 
 @Serializable
@@ -86,9 +93,6 @@ data class PracticeAnswerResponse(
 
 @Serializable
 data class PracticeEndRequest(val sessionId: String)
-
-@Serializable
-data class BookmarkRequest(val questionRef: String)
 
 @Serializable
 data class ReportRequest(
@@ -106,7 +110,6 @@ data class ProgressSummary(
     val wrongAnswers: Int = 0,
     val timeouts: Int = 0,
     val completionRate: Double = 0.0,
-    val bookmarkedCount: Int = 0,
     val weakQuestionCount: Int = 0,
     val xp: Int = 0,
     val streak: Int = 0

@@ -1,7 +1,7 @@
 import express from "express";
 import { authRequired } from "../middleware/authRequired.js";
 import { Question } from "../models/Question.js";
-import { publicQuestion } from "../utils/questions.js";
+import { publicQuestion, publicQuestionProjection } from "../utils/questions.js";
 import { parseRange } from "./questions.js";
 
 export const learningRouter = express.Router();
@@ -19,6 +19,7 @@ learningRouter.get("/questions", authRequired, async (req, res, next) => {
     })
       .sort({ sourceQuestionNumber: 1 })
       .limit(500)
+      .select(publicQuestionProjection)
       .lean();
 
     res.json({

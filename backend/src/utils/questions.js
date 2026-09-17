@@ -1,3 +1,20 @@
+export const publicQuestionProjection = {
+  _id: 1,
+  bankId: 1,
+  questionId: 1,
+  chapterId: 1,
+  chapterTitle: 1,
+  sourceQuestionNumber: 1,
+  sourcePageStart: 1,
+  sourcePageEnd: 1,
+  type: 1,
+  question: 1,
+  options: 1,
+  correctOptionKey: 1,
+  explanation: 1,
+  examFacts: 1
+};
+
 export function localized(value, language) {
   if (!value || typeof value !== "object") return "";
   return value[language] || value[language === "hi" ? "en" : "hi"] || "";

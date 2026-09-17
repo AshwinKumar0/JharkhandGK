@@ -8,7 +8,9 @@ export const reportsRouter = express.Router();
 reportsRouter.post("/", authRequired, async (req, res, next) => {
   try {
     const { questionRef, reason, message = "", suggestedTopicTitle = "", suggestedTags = [] } = req.body;
-    const question = await Question.findOne({ _id: questionRef }).lean();
+    const question = await Question.findOne({ _id: questionRef })
+      .select({ _id: 1, bankId: 1, questionId: 1, sourceQuestionNumber: 1, sourcePageStart: 1, sourcePageEnd: 1 })
+      .lean();
     if (!question) return res.status(404).json({ message: "Question not found" });
 
     const report = await Report.create({

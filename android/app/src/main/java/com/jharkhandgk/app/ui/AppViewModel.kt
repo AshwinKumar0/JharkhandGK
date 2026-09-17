@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.jharkhandgk.app.data.ApiClient
 import com.jharkhandgk.app.data.Auth0LoginRequest
-import com.jharkhandgk.app.data.BookmarkRequest
 import com.jharkhandgk.app.data.LoginRequest
 import com.jharkhandgk.app.data.PracticeAnswerRequest
 import com.jharkhandgk.app.data.PracticeEndRequest
@@ -20,8 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import java.util.UUID
 
 data class UiState(
     val token: String? = null,
@@ -36,8 +34,9 @@ data class UiState(
     val learningIndex: Int = 0,
     val practiceSessionId: String? = null,
     val practiceQuestion: QuestionDto? = null,
+    val pendingPracticeQuestion: QuestionDto? = null,
+    val practiceQuestionBuffer: List<QuestionDto> = emptyList(),
     val lastResult: PracticeResult? = null,
-    val bookmarks: List<QuestionDto> = emptyList(),
     val progress: ProgressSummary = ProgressSummary()
 )
 
@@ -49,7 +48,7 @@ data class PracticeResult(
     val updatedValue: Int
 )
 
-enum class AppMode { Learning, Practice, Revision }
+enum class AppMode { Learning, Practice }
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val sessionStore = SessionStore(application)
@@ -133,6 +132,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             _state.value = _state.value.copy(
                 practiceSessionId = response.sessionId,
                 practiceQuestion = response.nextQuestion,
+                practiceQuestionBuffer = response.questions.drop(1),
+                pendingPracticeQuestion = null,
                 lastResult = null
             )
         }
@@ -143,11 +144,19 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val state = _state.value
             val sessionId = state.practiceSessionId ?: return@runApi
             val question = state.practiceQuestion ?: return@runApi
+            val bufferedNext = state.practiceQuestionBuffer.firstOrNull()
             val response = api.answerPractice(
-                PracticeAnswerRequest(sessionId, question.questionRef, selectedOptionKey, timeTakenMs, timedOut)
+                PracticeAnswerRequest(
+                    sessionId,
+                    question.questionRef,
+                    selectedOptionKey,
+                    timeTakenMs,
+                    timedOut,
+                    UUID.randomUUID().toString()
+                )
             )
             _state.value = _state.value.copy(
-                practiceQuestion = response.nextQuestion,
+                pendingPracticeQuestion = bufferedNext ?: response.nextQuestion,
                 lastResult = PracticeResult(
                     response.isCorrect,
                     response.correctOptionKey,
@@ -159,24 +168,32 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun advancePracticeQuestion() {
+        val state = _state.value
+        _state.value = state.copy(
+            practiceQuestion = state.pendingPracticeQuestion,
+            practiceQuestionBuffer = if (state.practiceQuestionBuffer.isNotEmpty()) {
+                state.practiceQuestionBuffer.drop(1)
+            } else {
+                state.practiceQuestionBuffer
+            },
+            pendingPracticeQuestion = null,
+            lastResult = null
+        )
+    }
+
     fun endPractice() = viewModelScope.launch {
         val sessionId = _state.value.practiceSessionId ?: return@launch
         runApi {
             api.endPractice(PracticeEndRequest(sessionId))
-            _state.value = _state.value.copy(practiceSessionId = null, practiceQuestion = null, lastResult = null)
+            _state.value = _state.value.copy(
+                practiceSessionId = null,
+                practiceQuestion = null,
+                pendingPracticeQuestion = null,
+                practiceQuestionBuffer = emptyList(),
+                lastResult = null
+            )
         }
-    }
-
-    fun loadBookmarks() = viewModelScope.launch {
-        runApi { _state.value = _state.value.copy(bookmarks = api.bookmarks().questions) }
-    }
-
-    fun addBookmark(questionRef: String) = viewModelScope.launch {
-        runApi { api.addBookmark(BookmarkRequest(questionRef)) }
-    }
-
-    fun removeBookmark(questionRef: String) = viewModelScope.launch {
-        runApi { api.removeBookmark(URLEncoder.encode(questionRef, StandardCharsets.UTF_8.toString())) }
     }
 
     fun report(questionRef: String, reason: String, message: String, topic: String, tags: String) = viewModelScope.launch {

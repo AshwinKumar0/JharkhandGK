@@ -13,12 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -166,7 +164,6 @@ private fun MainScreen(state: UiState, viewModel: AppViewModel, modifier: Modifi
         when (state.mode) {
             AppMode.Learning -> LearningScreen(state, viewModel)
             AppMode.Practice -> PracticeScreen(state, viewModel)
-            AppMode.Revision -> RevisionScreen(state, viewModel)
         }
         StatusLine(state)
     }
@@ -191,11 +188,11 @@ private fun RangeAndMode(state: UiState, viewModel: AppViewModel) {
     }
     Spacer(Modifier.height(8.dp))
     SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-        listOf(AppMode.Practice, AppMode.Learning, AppMode.Revision).forEachIndexed { index, mode ->
+        listOf(AppMode.Practice, AppMode.Learning).forEachIndexed { index, mode ->
             SegmentedButton(
                 selected = state.mode == mode,
                 onClick = { viewModel.setMode(mode) },
-                shape = SegmentedButtonDefaults.itemShape(index, 3)
+                shape = SegmentedButtonDefaults.itemShape(index, 2)
             ) { Text(mode.name) }
         }
     }
@@ -214,7 +211,6 @@ private fun LearningScreen(state: UiState, viewModel: AppViewModel) {
             selectedKey = null,
             correctKey = null,
             onSelect = {},
-            onBookmark = { viewModel.addBookmark(question.questionRef) },
             onReport = { reason, message, topic, tags -> viewModel.report(question.questionRef, reason, message, topic, tags) }
         )
         Spacer(Modifier.height(8.dp))
@@ -269,34 +265,12 @@ private fun PracticeScreen(state: UiState, viewModel: AppViewModel) {
                 viewModel.answerPractice(key, timeTaken, timedOut = false)
             }
         },
-        onBookmark = { viewModel.addBookmark(question.questionRef) },
         onReport = { reason, message, topic, tags -> viewModel.report(question.questionRef, reason, message, topic, tags) }
     )
     state.lastResult?.let { result ->
         Spacer(Modifier.height(8.dp))
         Text(if (result.isCorrect) "Correct" else "Correct answer: ${result.correctOptionKey}", fontWeight = FontWeight.Bold)
         Text(result.explanation)
-    }
-}
-
-@Composable
-private fun RevisionScreen(state: UiState, viewModel: AppViewModel) {
-    LaunchedEffect(Unit) { viewModel.loadBookmarks(); viewModel.loadProgress() }
-    ModeLauncher("Revision Mode", "Start with bookmarked questions and your weak-question count.", Icons.Default.Timeline) {
-        viewModel.loadBookmarks()
-    }
-    Text("Weak questions: ${state.progress.weakQuestionCount}")
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(state.bookmarks) { question ->
-            QuestionCard(
-                question = question,
-                selectedKey = null,
-                correctKey = null,
-                onSelect = {},
-                onBookmark = { viewModel.removeBookmark(question.questionRef) },
-                onReport = { reason, message, topic, tags -> viewModel.report(question.questionRef, reason, message, topic, tags) }
-            )
-        }
     }
 }
 
@@ -319,7 +293,6 @@ private fun QuestionCard(
     selectedKey: String?,
     correctKey: String?,
     onSelect: (String) -> Unit,
-    onBookmark: () -> Unit,
     onReport: (String, String, String, String) -> Unit
 ) {
     var showReport by remember { mutableStateOf(false) }
@@ -328,7 +301,6 @@ private fun QuestionCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Q${question.sourceQuestionNumber}", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Text("Page ${question.sourcePageStart ?: "-"}")
-                IconButton(onClick = onBookmark) { Icon(Icons.Default.Bookmark, contentDescription = "Bookmark") }
                 IconButton(onClick = { showReport = true }) { Icon(Icons.Default.Flag, contentDescription = "Report") }
             }
             Text(question.question, style = MaterialTheme.typography.titleMedium)

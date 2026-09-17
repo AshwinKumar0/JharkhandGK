@@ -1,10 +1,8 @@
 package com.jharkhandgk.app.data
 
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -35,15 +33,6 @@ interface ApiService {
 
     @POST("practice/end")
     suspend fun endPractice(@Body body: PracticeEndRequest)
-
-    @GET("bookmarks")
-    suspend fun bookmarks(): QuestionsResponse
-
-    @POST("bookmarks")
-    suspend fun addBookmark(@Body body: BookmarkRequest)
-
-    @DELETE("bookmarks/{questionRef}")
-    suspend fun removeBookmark(@Path("questionRef", encoded = true) questionRef: String)
 
     @POST("reports")
     suspend fun report(@Body body: ReportRequest)

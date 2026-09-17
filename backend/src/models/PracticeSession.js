@@ -10,10 +10,15 @@ const practiceSessionSchema = new mongoose.Schema(
     correctCount: { type: Number, default: 0 },
     wrongCount: { type: Number, default: 0 },
     timeoutCount: { type: Number, default: 0 },
+    questionIds: { type: [String], default: [] },
+    currentIndex: { type: Number, default: 0 },
     startedAt: { type: Date, default: Date.now },
     endedAt: { type: Date, default: null }
   },
   { timestamps: true }
 );
+
+practiceSessionSchema.index({ userId: 1, endedAt: 1 });
+practiceSessionSchema.index({ userId: 1, updatedAt: -1 });
 
 export const PracticeSession = mongoose.model("PracticeSession", practiceSessionSchema);

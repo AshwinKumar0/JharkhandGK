@@ -16,7 +16,7 @@ plugins {
         versionCode = 1
         versionName = "0.1.0"
 
-        buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:4000/api/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://jharkhandgk.onrender.com/api/\"")
         
         manifestPlaceholders["auth0Domain"] = "dev-qe5872uaalyzgbm2.us.auth0.com"
         manifestPlaceholders["auth0Scheme"] = "com.jharkhandgk.app"

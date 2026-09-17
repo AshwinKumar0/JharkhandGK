@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import express from "express";
 import { supportedLanguages } from "../config/constants.js";
-import { authRequired } from "../middleware/authRequired.js";
+import { authRequired, requireCurrentUser } from "../middleware/authRequired.js";
 import { User } from "../models/User.js";
 import { signToken, verifyAuth0IdToken } from "../utils/auth.js";
 
@@ -97,7 +97,7 @@ authRouter.post("/auth0", async (req, res, next) => {
   }
 });
 
-authRouter.get("/me", authRequired, (req, res) => {
+authRouter.get("/me", authRequired, requireCurrentUser, (req, res) => {
   res.json({ user: publicUser(req.user) });
 });
 
