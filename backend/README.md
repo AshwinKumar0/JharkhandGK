@@ -31,6 +31,7 @@ This backend is ready for Render as a free Web Service.
 ```text
 Root Directory: backend
 Runtime: Node
+Node Version: 20
 Build Command: npm ci
 Start Command: npm start
 Health Check Path: /health
@@ -44,6 +45,7 @@ MONGODB_URI=<your MongoDB Atlas connection string>
 JWT_SECRET=<a long random secret>
 AUTH0_DOMAIN=<your Auth0 domain>
 AUTH0_CLIENT_ID=<your Auth0 client id>
+NODE_VERSION=20
 QUESTION_COLLECTION=GK
 CORS_ORIGIN=*
 DEFAULT_BANK_ID=jharkhand-pocket-gk-mcqs

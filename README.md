@@ -157,7 +157,7 @@ Implemented:
 - MongoDB Atlas connection via Mongoose.
 - `.env.example` for safe local configuration.
 - Render deployment blueprint in `render.yaml`.
-- Node engine declaration for hosted deployment.
+- Node 20 LTS engine declaration for hosted deployment.
 - Startup validation for required backend secrets.
 - JWT auth helpers.
 - Auth routes:
@@ -344,6 +344,7 @@ Root Directory: backend
 Build Command: npm ci
 Start Command: npm start
 Health Check Path: /health
+Node Version: 20
 ```
 
 Set the secret environment variables in Render, then verify:
@@ -380,7 +381,7 @@ http://192.168.1.10:4000/api/
 - Implemented Android Compose scaffold and main MVP screens.
 - Added root `.gitignore`.
 - Added this living README.
-- Prepared backend for GitHub and Render deployment with safe env template, Node engine, required-env validation, and deployment docs.
+- Prepared backend for GitHub and Render deployment with safe env template, Node 20 engine, required-env validation, and deployment docs.
 
 ## README Maintenance Rule
 
