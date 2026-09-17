@@ -4,6 +4,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
 import { authRouter } from "./routes/auth.js";
+import { getDatabaseStatus } from "./config/db.js";
 import { bookmarksRouter } from "./routes/bookmarks.js";
 import { learningRouter } from "./routes/learning.js";
 import { practiceRouter } from "./routes/practice.js";
@@ -27,7 +28,7 @@ export function createApp() {
     })
   );
 
-  app.get("/health", (_req, res) => res.json({ ok: true }));
+  app.get("/health", (_req, res) => res.json({ ok: true, db: getDatabaseStatus() }));
   app.use("/api/auth", authRouter);
   app.use("/api/questions", questionsRouter);
   app.use("/api/practice", practiceRouter);

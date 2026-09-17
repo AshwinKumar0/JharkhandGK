@@ -11,8 +11,16 @@ for (const key of requiredEnv) {
   }
 }
 
-await connectDatabase(process.env.MONGODB_URI);
+const app = createApp();
 
-createApp().listen(port, () => {
+app.listen(port, () => {
   console.log(`Jharkhand GK backend running on http://localhost:${port}`);
 });
+
+connectDatabase(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((error) => {
+    console.error("MongoDB connection failed", error);
+  });

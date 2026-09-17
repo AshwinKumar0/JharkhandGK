@@ -6,5 +6,12 @@ export async function connectDatabase(uri) {
   }
 
   mongoose.set("strictQuery", true);
-  await mongoose.connect(uri);
+  await mongoose.connect(uri, {
+    serverSelectionTimeoutMS: 10000
+  });
+}
+
+export function getDatabaseStatus() {
+  const states = ["disconnected", "connected", "connecting", "disconnecting"];
+  return states[mongoose.connection.readyState] || "unknown";
 }
