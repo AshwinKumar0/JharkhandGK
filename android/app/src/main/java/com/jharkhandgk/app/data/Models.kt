@@ -50,7 +50,9 @@ data class QuestionDto(
     val options: List<OptionDto>,
     val explanation: String = "",
     val examFacts: List<String> = emptyList(),
-    val value: Int? = null
+    val value: Int? = null,
+    // Only sent by the learning endpoint; practice questions never include the answer key.
+    val correctOptionKey: String? = null
 )
 
 @Serializable
