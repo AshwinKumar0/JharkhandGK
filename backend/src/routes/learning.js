@@ -23,7 +23,10 @@ learningRouter.get("/questions", authRequired, async (req, res, next) => {
       .lean();
 
     res.json({
-      questions: questions.map((question) => publicQuestion(question, req.user.preferredLanguage))
+      questions: questions.map((question) =>
+        // Learning mode is study mode: the app needs the answer key to highlight the correct option.
+        publicQuestion(question, req.user.preferredLanguage, { correctOptionKey: question.correctOptionKey })
+      )
     });
   } catch (error) {
     next(error);

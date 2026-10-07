@@ -15,6 +15,10 @@ import { reportsRouter } from "./routes/reports.js";
 export function createApp() {
   const app = express();
 
+  // Render (and most PaaS hosts) sit behind one reverse proxy. Without this, express-rate-limit
+  // sees the proxy's IP for every request, so all users share a single 300-request budget.
+  app.set("trust proxy", 1);
+
   app.use(helmet());
   app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
   app.use(express.json({ limit: "1mb" }));
@@ -39,7 +43,10 @@ export function createApp() {
 
   app.use((req, res) => res.status(404).json({ message: `Route not found: ${req.method} ${req.path}` }));
   app.use((error, _req, res, _next) => {
-    console.error(error);
+    if (!error.status && (error.name === "ValidationError" || error.name === "CastError")) {
+      error.status = 400;
+    }
+    if (!error.status || error.status >= 500) console.error(error);
     res.status(error.status || 500).json({ message: error.message || "Internal server error" });
   });
 
