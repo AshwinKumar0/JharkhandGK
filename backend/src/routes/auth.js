@@ -76,6 +76,11 @@ authRouter.post("/auth0", async (req, res, next) => {
     let user = await User.findOne({ auth0Sub: payload.sub });
     if (!user) {
       user = await User.findOne({ usernameOrEmail: email });
+      if (user && payload.email_verified !== true) {
+        // Never attach an Auth0 identity to an existing account on an unverified email claim:
+        // anyone could sign up in Auth0 with someone else's address and take over their account.
+        return res.status(409).json({ message: "An account with this email already exists. Verify your email with Auth0 or log in with your password." });
+      }
       if (user) {
         user.auth0Sub = payload.sub;
         user.name = user.name || name;
