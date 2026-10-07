@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -149,7 +151,7 @@ private fun LanguageSelector(language: String, onLanguageChange: (String) -> Uni
 
 @Composable
 private fun MainScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("Namaste, ${state.user?.name.orEmpty()}", style = MaterialTheme.typography.titleLarge)
@@ -209,7 +211,7 @@ private fun LearningScreen(state: UiState, viewModel: AppViewModel) {
         QuestionCard(
             question = question,
             selectedKey = null,
-            correctKey = null,
+            correctKey = question.correctOptionKey,
             onSelect = {},
             onReport = { reason, message, topic, tags -> viewModel.report(question.questionRef, reason, message, topic, tags) }
         )
@@ -271,6 +273,10 @@ private fun PracticeScreen(state: UiState, viewModel: AppViewModel) {
         Spacer(Modifier.height(8.dp))
         Text(if (result.isCorrect) "Correct" else "Correct answer: ${result.correctOptionKey}", fontWeight = FontWeight.Bold)
         Text(result.explanation)
+        Spacer(Modifier.height(8.dp))
+        Button(onClick = viewModel::advancePracticeQuestion, modifier = Modifier.fillMaxWidth()) {
+            Text("Next question")
+        }
     }
 }
 
@@ -307,7 +313,8 @@ private fun QuestionCard(
             question.options.forEach { option ->
                 val label = when {
                     correctKey == option.key -> "${option.key}. ${option.text} ✓"
-                    selectedKey == option.key -> "${option.key}. ${option.text}"
+                    selectedKey == option.key && correctKey != null -> "${option.key}. ${option.text} ✗"
+                    selectedKey == option.key -> "${option.key}. ${option.text} •"
                     else -> "${option.key}. ${option.text}"
                 }
                 OutlinedButton(onClick = { onSelect(option.key) }, modifier = Modifier.fillMaxWidth()) {
